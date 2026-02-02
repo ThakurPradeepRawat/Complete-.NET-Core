@@ -1,11 +1,13 @@
 ﻿using ClosedXML.Excel;
 using Common.BAL.Interfaces;
+using Common.DAL.Interface;
 using Common.Model.DTO;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,33 +16,54 @@ namespace Common.BAL.Services
 {
     public class ExcelService:IExcelService
     {
-        public List<CreateStudentRequestDTO> ReadStudents(Stream Stream)
+        private readonly IStudentRepository _studentRepository;
+        public ExcelService(IStudentRepository studentRepository)
+        {
+            _studentRepository = studentRepository;
+        }
+        public  Task<string>  ReadStudents(Stream Stream)
         {
             using var workbook = new XLWorkbook(Stream);
             var ws = workbook.Worksheet(1);
-            var list = new List<CreateStudentRequestDTO>();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("FirstName" , typeof(string));
+            dt.Columns.Add("LastName" , typeof(string));
+            dt.Columns.Add("Email" , typeof(string));
+            dt.Columns.Add("MobileNumber" , typeof(string));    
+            dt.Columns.Add("DateOfBirth" , typeof(string));
+            dt.Columns.Add("FathersName" , typeof (string));
+            dt.Columns.Add("MothersName" , typeof(string));
+            dt.Columns.Add("Address" , typeof(string)) ;
+            dt.Columns.Add("IsActive", typeof(bool));
+            dt.Columns.Add("CreatedAT" ,typeof(DateTime));
+            dt.Columns.Add("UpdatedAt", typeof(DateTime));
+     
             foreach (var row in ws.RowsUsed().Skip(1))
             {
-                try {
-                    list.Add(new CreateStudentRequestDTO
-                    {
-                        FirstName = row.Cell(1).GetString(),
-                        LastName = row.Cell(2).GetString(),
-                        Email = row.Cell(3).GetString(),
-                        MobileNumber = row.Cell(4).GetString(),
-                        DateOfBirth = DateOnly.FromDateTime(row.Cell(5).GetDateTime()),
-                        FathersName = row.Cell(6).GetString(),
-                        MothersName = row.Cell(7).GetString(),
-                        Address = row.Cell(8).GetString()
-                    });
-                        }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error");
-                }
+                dt.Rows.Add(
+                    row.Cell(1).GetString(), 
+                    row.Cell(2).GetString(),
+                    row.Cell(3).GetString(),
+                    row.Cell(4).GetString(), 
+                    row.Cell(5).GetString(), 
+                    row.Cell(6).GetString(), 
+                    row.Cell(6).GetString(), 
+                    row.Cell(8).GetString(),
+                    1,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow
+                    );      
+                      
             }
-            Console.WriteLine(list);
-            return list;
+            return _studentRepository.BulkDataValidation( dt );
+            
+            
+        }
+
+        public void AddBulk(int BatchId)
+        {
+            _studentRepository.AddBulk(BatchId);
         }
        
     }

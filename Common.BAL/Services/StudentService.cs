@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace Common.BAL.Services
 {
@@ -79,5 +80,7 @@ namespace Common.BAL.Services
             var student = _studentRepository.GetById(StudentID);
             return student;
         }
+
+       
     }
 }

@@ -144,25 +144,36 @@ namespace Common.DAL.Repository
             }, "Studens Data not Fetched");
 
 
-
+        }
+        public async Task <string> BulkDataValidation(DataTable dt)
+        {
+            string json;
+            SqlConnection con = _connectionFactory.CreateConnection();
+            SqlCommand cmd = new SqlCommand("sp_ValidateStudents", con);
+            cmd.CommandType= CommandType.StoredProcedure;
+            var batchParam = new SqlParameter("@BatchID", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+            cmd.Parameters.Add(batchParam);
+            var param = cmd.Parameters.AddWithValue("@Students", dt);
+            param.SqlDbType = SqlDbType.Structured;
+            param.TypeName = "StudentTableType";
+            await con.OpenAsync();
+            json = (string) await cmd.ExecuteScalarAsync();
+            return json;
 
         }
-
-        public HashSet<string> FetchEmail()
+        public void AddBulk(int BatchID)
         {
-            var emailSet = new HashSet<string>();
-
             SqlConnection con = _connectionFactory.CreateConnection();
-            SqlCommand cmd = new SqlCommand("sp_AllEmail", con);
+            SqlCommand cmd = new SqlCommand("sp_SubmitBulkData", con);
             cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@BatchID", BatchID);
             con.Open();
-            using SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                emailSet.Add(reader.GetString(0));
-            }
-            return emailSet;
-                
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
 
 

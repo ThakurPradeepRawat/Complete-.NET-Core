@@ -1,5 +1,6 @@
 ﻿using Common.Model.Entities;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Common.DAL.Interface
 {
@@ -13,7 +14,8 @@ namespace Common.DAL.Interface
         IEnumerable<StudentModel> GetAll();
 
         void Delete(int StudentID);
-        HashSet<string> FetchEmail();
+       Task<string> BulkDataValidation(DataTable dt);
+        void AddBulk(int BatchID);
 
     }
 }

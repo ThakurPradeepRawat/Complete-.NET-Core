@@ -9,6 +9,7 @@ namespace Common.BAL.Interfaces
 {
    public  interface IExcelService 
     {
-        public List<CreateStudentRequestDTO> ReadStudents(Stream stream);
+        public Task<string> ReadStudents(Stream stream);
+        void AddBulk(int BatchId);
     }
 }

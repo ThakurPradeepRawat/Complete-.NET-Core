@@ -1,4 +1,5 @@
 ﻿using Common.BAL.Interfaces;
+using Common.BAL.Services;
 using Common.Model.DTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,14 +10,15 @@ namespace CommonAPI.Controllers
     public class TemplateController : ControllerBase
     {
         private readonly IExcelService _excelService;
-        private readonly IExcelDataValidation _excelDataValidation;
+        private readonly IStudentService _studentService;
 
         public TemplateController(
             IExcelService excelService,
-            IExcelDataValidation excelDataValidation)
+             IStudentService studentService)
         {
             _excelService = excelService;
-            _excelDataValidation = excelDataValidation;
+         
+            _studentService = studentService;   
         }
 
         // ---------------- DOWNLOAD TEMPLATE ----------------
@@ -43,29 +45,30 @@ namespace CommonAPI.Controllers
 
         // ---------------- UPLOAD TEMPLATE ----------------
         [HttpPost("upload-template")]
-        public async Task<IActionResult> UploadTemplate( IFormFile file)
+        public async Task<IActionResult> UploadTemplate(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 
+
             using var stream = file.OpenReadStream();
 
             // Read Excel
-            List<CreateStudentRequestDTO> students =
-                _excelService.ReadStudents(stream);
+            var students =
+                await _excelService.ReadStudents(stream);
+           
+            return Content(students, "application/json");
 
-            // Validate Excel Data
-            var (valid, invalid) =
-                await _excelDataValidation.ValidateExcel(students);
+        }
 
-            return Ok(new
-            {
-                Total = students.Count,
-                ValidCount = valid.Count,
-                InvalidCount = invalid.Count,
-                ValidRecords = valid,
-                InvalidRecords = invalid
-            });
+        // ------------- bulk upload --------------------------
+        [HttpGet("bulk-upload")]
+        public IActionResult bulkUpload(int batchId)
+        {
+            _excelService.AddBulk(batchId);
+            
+      
+            return Created();
         }
     }
 }

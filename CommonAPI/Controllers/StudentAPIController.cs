@@ -37,7 +37,7 @@ namespace CommonAPI.Controllers
 
 
         [HttpDelete]
-        [Authorize]
+        
 
         public IActionResult Delete(int StudentId)
         {
