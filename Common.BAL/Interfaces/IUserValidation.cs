@@ -10,6 +10,6 @@ namespace Common.BAL.Interfaces
     public interface IUserValidation
     {
         bool PassWordValidation(LoginDTO Login);
-        void RagisterUser(LoginDTO Login);
+        void RegisterUser(LoginDTO Login);
     }
 }

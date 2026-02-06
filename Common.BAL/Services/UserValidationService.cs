@@ -26,7 +26,7 @@ namespace Common.BAL.Services
             return IsValid;
         }
 
-        public void RagisterUser(LoginDTO Login)
+        public void RegisterUser(LoginDTO Login)
         {
             Console.WriteLine(Login);
            string  Email = Login.Email;

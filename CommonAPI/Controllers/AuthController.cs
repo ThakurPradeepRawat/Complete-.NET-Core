@@ -61,15 +61,15 @@ namespace CommonAPI.Controllers
         }
 
 
-        [HttpPost("Ragister")]
+        [HttpPost("Register")]
         [AllowAnonymous]
-        public IActionResult Ragister([FromBody]  LoginDTO login)
+        public IActionResult Register([FromBody]  LoginDTO login)
         {
             if (login == null)
             {
                 return Unauthorized();
             }
-            _UserValidation.RagisterUser(login);
+            _UserValidation.RegisterUser(login);
             
              return Ok();
         }
